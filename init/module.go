@@ -116,7 +116,14 @@ func finitModule(module string) error {
 	}
 	defer f.Close()
 
-	if err := unix.FinitModule(int(f.Fd()), "", 0); err != nil {
+	var params string
+	if module == "vfio_pci" {
+		if val, ok := cmdline["vfio-pci.ids"]; ok {
+			params = "ids=" + val
+		}
+	}
+
+	if err := unix.FinitModule(int(f.Fd()), params, 0); err != nil {
 		return fmt.Errorf("finit(%v): %v", module, err)
 	}
 
